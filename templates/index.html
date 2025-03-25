@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Monitoring System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Plant Monitoring System</h1>
+        </div>
+
+        <div class="video-feed">
+            <!-- Placeholder for video feed -->
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                <p>Video Feed Placeholder</p>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="button" onclick="waterPlant()">Water Plant</button>
+            <button class="button" onclick="toggleLights()">Toggle Lights</button>
+        </div>
+
+        <div class="info-panel">
+            <h2>Plant Status</h2>
+            <div class="moisture-level">
+                Soil Moisture: <span id="moisture-value">--</span>%
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to update moisture level
+        function updateMoisture() {
+            fetch('/api/soil-moisture')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('moisture-value').textContent = data.moisture;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to water plant
+        function waterPlant() {
+            fetch('/api/water-plant')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to toggle lights
+        function toggleLights() {
+            fetch('/api/toggle-lights')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Update moisture level every 5 seconds
+        updateMoisture();
+        setInterval(updateMoisture, 5000);
+    </script>
+</body>
+</html> 
