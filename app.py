@@ -88,6 +88,8 @@ def api_water_plant():
 
 def cleanup():
     GPIO.cleanup()
+    if hasattr(app, 'plant'):
+        app.plant.close()
 
 if __name__ == '__main__':
     try:
