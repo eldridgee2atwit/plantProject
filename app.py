@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
 import RPi.GPIO as GPIO
 import time
-from src.readData import read_light, read_moisture
+from src.plantData import plantData
 
 app = Flask(__name__)
 
@@ -14,22 +14,25 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(PUMP_PIN, GPIO.OUT)
 GPIO.setup(LIGHT_PIN, GPIO.OUT)
 
+# Initialize plant data reader
+plant = plantData()
+
 # Track light state
 light_state = False
 
 def get_soil_moisture():
     try:
-        return read_moisture()
+        return plant.readMoisture()
     except Exception as e:
         print(f"Error reading moisture: {e}")
         return 1000  # Return default value if error
 
 def get_light_level():
     try:
-        return read_light()
+        return int(plant.readLight())
     except Exception as e:
         print(f"Error reading light: {e}")
-        return 1000  # Return default value if error
+        return 0  # Return default value if error
 
 def toggle_lights():
     global light_state
