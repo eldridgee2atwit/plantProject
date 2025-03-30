@@ -1,34 +1,35 @@
 from flask import Flask, render_template, jsonify
 import RPi.GPIO as GPIO
 import time
+from src.readData import read_light, read_moisture
 
 app = Flask(__name__)
 
 # GPIO Setup
 PUMP_PIN = 17  # GPIO pin for water pump
 LIGHT_PIN = 18  # GPIO pin for lights
-MOISTURE_PIN = 27  # GPIO pin for moisture sensor
 
 # Initialize GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PUMP_PIN, GPIO.OUT)
 GPIO.setup(LIGHT_PIN, GPIO.OUT)
-GPIO.setup(MOISTURE_PIN, GPIO.IN)
 
 # Track light state
 light_state = False
 
 def get_soil_moisture():
-    # Read from moisture sensor
-    # This is a simple digital read - you might need to adjust based on your sensor
     try:
-        moisture_value = GPIO.input(MOISTURE_PIN)
-        # Convert to percentage (this is a simplified example)
-        # You'll need to calibrate these values for your specific sensor
-        return 100 if moisture_value == 0 else 0
+        return read_moisture()
     except Exception as e:
         print(f"Error reading moisture: {e}")
         return 50  # Return default value if error
+
+def get_light_level():
+    try:
+        return read_light()
+    except Exception as e:
+        print(f"Error reading light: {e}")
+        return 0  # Return default value if error
 
 def toggle_lights():
     global light_state
@@ -57,6 +58,11 @@ def index():
 def soil_moisture():
     moisture = get_soil_moisture()
     return jsonify({"moisture": moisture})
+
+@app.route('/api/light-level')
+def light_level():
+    light = get_light_level()
+    return jsonify({"light": light})
 
 @app.route('/api/toggle-lights')
 def api_toggle_lights():

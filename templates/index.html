@@ -12,13 +12,6 @@
             <h1>Plant Monitoring System</h1>
         </div>
 
-        <div class="video-feed">
-            <!-- Placeholder for video feed -->
-            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                <p>Video Feed Placeholder</p>
-            </div>
-        </div>
-
         <div class="control-panel">
             <button class="button" onclick="waterPlant()">Water Plant</button>
             <button class="button" onclick="toggleLights()">Toggle Lights</button>
@@ -28,6 +21,9 @@
             <h2>Plant Status</h2>
             <div class="moisture-level">
                 Soil Moisture: <span id="moisture-value">--</span>%
+            </div>
+            <div class="light-level">
+                Light Level: <span id="light-value">--</span>
             </div>
         </div>
     </div>
@@ -39,6 +35,16 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('moisture-value').textContent = data.moisture;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to update light level
+        function updateLight() {
+            fetch('/api/light-level')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('light-value').textContent = data.light;
                 })
                 .catch(error => console.error('Error:', error));
         }
@@ -63,9 +69,11 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        // Update moisture level every 5 seconds
+        // Update values every 5 seconds
         updateMoisture();
+        updateLight();
         setInterval(updateMoisture, 5000);
+        setInterval(updateLight, 5000);
     </script>
 </body>
 </html> 
