@@ -24,10 +24,8 @@ def read_light():
     if ser is None:
         return 0
     try:
-        light, _ = read_serial_data()
-        if light is None:
-            return 0
-        return 1 if light > 0 else 0
+        value = ser.read_until(",").decode('utf-8')
+        return 1 if int(value) > 0 else 0
     except:
         return 0
 
@@ -35,9 +33,8 @@ def read_moisture():
     if ser is None:
         return 1000
     try:
-        _, moisture = read_serial_data()
-        if moisture is None:
-            return 1000
-        return moisture
+        data = str(ser.read_until('\n').decode('utf-8'))
+        index = data.find(',')
+        return int(data[index+1])
     except:
         return 1000
