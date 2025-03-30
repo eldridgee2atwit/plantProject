@@ -22,14 +22,14 @@ def get_soil_moisture():
         return read_moisture()
     except Exception as e:
         print(f"Error reading moisture: {e}")
-        return 50  # Return default value if error
+        return 1000  # Return default value if error
 
 def get_light_level():
     try:
         return read_light()
     except Exception as e:
         print(f"Error reading light: {e}")
-        return 0  # Return default value if error
+        return 1000  # Return default value if error
 
 def toggle_lights():
     global light_state
