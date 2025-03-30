@@ -32,11 +32,11 @@ class plantData:
         try:
             self.ser.reset_input_buffer()  # Clear any stale data
             data = str(self.ser.read_until('\n').decode('utf-8')).strip()
-            index = data.find(',')
-            if index == -1:
-                print("No comma found in moisture data")
-                return 1000
-            return int(data[index+1])
+            parts = data.split(',')
+            if len(parts) > 1:
+                return int(parts[1])
+            print("No comma found in moisture data")
+            return 1000
         except Exception as e:
             print(f"Error reading moisture: {e}")
             return 1000
