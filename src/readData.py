@@ -17,8 +17,8 @@ def parse_serial_data(data):
         try:
             return int(parts[0])
         except:
-            return 75  # Default value if parsing fails
-    return 75  # Default value if no parts
+            return 1009  # Default value if parsing fails
+    return 1009  # Default value if no parts
 
 def read_serial_data():
     if ser is None:
@@ -53,13 +53,13 @@ def read_light():
 def read_moisture():
     if ser is None:
         print("No serial connection, returning test value")
-        return 60  # Test value
+        return 1000  # Test value
     try:
         received_data = read_serial_data()
         if received_data is None:
-            return 60
+            return 1000
         print(f"Received moisture data: {received_data}")
         return parse_serial_data(received_data)
     except Exception as e:
         print(f"Error reading moisture: {e}")
-        return 60  # Test value
+        return 1000  # Test value
