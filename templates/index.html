@@ -3,48 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Monitor</title>
+    <title>Plant Monitoring System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Plant Monitor</h1>
-        
-        <div class="control-panel">
-            <div class="moisture-level">
-                <h2>Soil Moisture</h2>
-                <span id="moisture-value">--</span>%
-            </div>
-            
-            <div class="light-level">
-                <h2>Light Status</h2>
-                <span id="light-value">--</span>
-            </div>
+        <div class="header">
+            <h1>Plant Monitoring System</h1>
         </div>
 
-        <div class="control-buttons">
-            <button onclick="toggleLights()" id="light-button">Toggle Lights</button>
-            <button onclick="waterPlant()" id="water-button">Water Plant</button>
+        <div class="control-panel">
+            <button class="button" onclick="checkStatus()">Check Status</button>
+            <button class="button" onclick="waterPlant()">Water Plant</button>
+            <button class="button" onclick="toggleLights()">Toggle Lights</button>
+        </div>
+
+        <div class="info-panel">
+            <h2>Plant Status</h2>
+            <div class="moisture-level">
+                Soil Moisture: <span id="moisture-value">--</span>%
+            </div>
+            <div class="light-level">
+                Light Level: <span id="light-value">--</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // Function to update moisture level
-        function updateMoisture() {
+        // Function to check both moisture and light status
+        function checkStatus() {
+            // Update moisture
             fetch('/api/soil-moisture')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('moisture-value').textContent = data.moisture;
                 })
-                .catch(error => console.error('Error:', error));
-        }
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('moisture-value').textContent = 'ERROR';
+                });
 
-        // Function to update light status
-        function updateLight() {
+            // Update light
             fetch('/api/light-level')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('light-value').textContent = data.light;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('light-value').textContent = 'ERROR';
+                });
+        }
+
+        // Function to water plant
+        function waterPlant() {
+            fetch('/api/water-plant')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
                 })
                 .catch(error => console.error('Error:', error));
         }
@@ -54,32 +70,13 @@
             fetch('/api/toggle-lights')
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data.message);
+                    alert(data.message);
                 })
                 .catch(error => console.error('Error:', error));
         }
 
-        // Function to water plant
-        function waterPlant() {
-            fetch('/api/water-plant')
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.message);
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        // Update values every 5 seconds
-        function updateValues() {
-            updateMoisture();
-            updateLight();
-        }
-
-        // Initial update
-        updateValues();
-        
-        // Set up automatic updates
-        setInterval(updateValues, 5000);
+        // Initial check when page loads
+        checkStatus();
     </script>
 </body>
 </html> 
