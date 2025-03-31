@@ -1,21 +1,19 @@
 from flask import Flask, render_template, jsonify
-import time
+import RPi.GPIO as gpio
+import src.pump
+from time import sleep
 from src.plantData import plantData
-from multiprocessing import Process
-
+# PUMP_PIN = 18
 app = Flask(__name__)
-
 # GPIO Setup
-PUMP_PIN = 17  # GPIO pin for water pump
-LIGHT_PIN = 18  # GPIO pin for lights
+# PUMP_PIN = 17  # GPIO pin for water pump
+# LIGHT_PIN = 18  # GPIO pin for lights
 
 # Initialize GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(PUMP_PIN, GPIO.OUT)
-GPIO.setup(LIGHT_PIN, GPIO.OUT)
 
 # Initialize plant data reader
 plant = plantData()
+pump = src.pump.pump()
 
 
 def get_soil_moisture():
@@ -36,17 +34,14 @@ def toggle_lights():
     global light_state
     try:
         light_state = not light_state
-        GPIO.output(LIGHT_PIN, light_state)
+        #GPIO.output(LIGHT_PIN, light_state)
         return {"status": "success", "message": f"Lights {'on' if light_state else 'off'}"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
 def water_plant():
     try:
-        # Activate pump for 1 second
-        GPIO.output(PUMP_PIN, GPIO.HIGH)
-        time.sleep(1)
-        GPIO.output(PUMP_PIN, GPIO.LOW)
+        # Activate pump for 3 second
         return {"status": "success", "message": "Watering complete"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -79,16 +74,20 @@ def api_toggle_lights():
 
 @app.route('/api/water-plant')
 def api_water_plant():
+    pump.water()
     result = water_plant()
     return jsonify(result)
 
 def cleanup():
-    GPIO.cleanup()
     if hasattr(app, 'plant'):
         app.plant.close()
+        gpio.cleanup()
 
 if __name__ == '__main__':
     try:
+        # gpio.setmode(gpio.BCM)
+        # gpio.setup(PUMP_PIN, gpio.OUT)
+        # gpio.output(PUMP_PIN, gpio.LOW)
         app.run(debug=True, host='0.0.0.0', port=8080, use_reloader=False)
     finally:
         cleanup() 
