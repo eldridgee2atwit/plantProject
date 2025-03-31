@@ -59,20 +59,29 @@ def index():
 
 @app.route('/api/soil-moisture')
 def soil_moisture():
-    moisture = plant.readMoisture()
-    return jsonify({"moisture": moisture})
+    try:
+        moisture = plant.readMoisture()
+        # If we get an error code (1000-2000), return it as is
+        if moisture >= 1000:
+            return jsonify({"moisture": moisture})
+        return jsonify({"moisture": moisture})
+    except Exception as e:
+        return jsonify({"moisture": 2000})  # General error code
 
 @app.route('/api/light-level')
 def light_level():
     try:
-        light = plant.readLight()
+        light = int(plant.readLight())
         if light == 0:
             return jsonify({"light": "ON"})
         elif light == 1:
             return jsonify({"light": "OFF"})
+        elif light == 3000:  # Error code from plantData.py
+            return jsonify({"light": "ERROR", "code": light})
+        else:
+            return jsonify({"light": "ERROR", "raw_value": light})
     except Exception as e:
-        print(f"Error in light_level endpoint: {e}")
-        return jsonify({"light": "ERROR", "message": str(e)})
+        return jsonify({"light": "ERROR", "code": 2001})  # General error code
 
 @app.route('/api/toggle-lights')
 def api_toggle_lights():
