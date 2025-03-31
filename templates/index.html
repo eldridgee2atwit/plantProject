@@ -88,17 +88,17 @@
                     const lightValue = document.getElementById('light-value');
                     const lightStatus = document.getElementById('light-status');
                     
-                    // Check if the value is valid (0 or 1)
-                    if (data.light === 0 || data.light === 1) {
+                    // Check if the value is valid (ON or OFF)
+                    if (data.light === 'ON' || data.light === 'OFF') {
                         lastValidLight = data.light;
-                        lightValue.textContent = data.light === 0 ? 'ON' : 'OFF';
-                        lightStatus.textContent = data.light === 0 ? 'ON' : 'OFF';
-                        lightStatus.className = `status ${data.light === 0 ? 'on' : 'off'}`;
+                        lightValue.textContent = data.light;
+                        lightStatus.textContent = data.light;
+                        lightStatus.className = `status ${data.light.toLowerCase()}`;
                     } else if (lastValidLight !== null) {
                         // Use last valid value if current value is invalid
-                        lightValue.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
-                        lightStatus.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
-                        lightStatus.className = `status ${lastValidLight === 0 ? 'on' : 'off'}`;
+                        lightValue.textContent = lastValidLight;
+                        lightStatus.textContent = lastValidLight;
+                        lightStatus.className = `status ${lastValidLight.toLowerCase()}`;
                     } else {
                         lightValue.textContent = '--';
                         lightStatus.textContent = 'Error';
@@ -110,9 +110,9 @@
                     if (lastValidLight !== null) {
                         const lightValue = document.getElementById('light-value');
                         const lightStatus = document.getElementById('light-status');
-                        lightValue.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
-                        lightStatus.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
-                        lightStatus.className = `status ${lastValidLight === 0 ? 'on' : 'off'}`;
+                        lightValue.textContent = lastValidLight;
+                        lightStatus.textContent = lastValidLight;
+                        lightStatus.className = `status ${lastValidLight.toLowerCase()}`;
                     }
                 });
         }
