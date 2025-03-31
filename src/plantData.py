@@ -12,7 +12,6 @@ class plantData:
             self.ser.reset_input_buffer()
             time.sleep(0.1)  # Give the serial port time to stabilize
         except Exception as e:
-            print(f"Failed to initialize serial port: {e}")
             self.ser = None
 
     def readLight(self):
@@ -28,18 +27,18 @@ class plantData:
 
     def readMoisture(self):
         if self.ser is None:
-            return 1000
+            return 1000  # Error code 1000: No serial connection
         try:
             self.ser.reset_input_buffer()  # Clear any stale data
             data = str(self.ser.read_until('\n').decode('utf-8')).strip()
             parts = data.split(',')
             if len(parts) > 1:
                 return int(parts[1])
-            print("No comma found in moisture data")
-            return 1000
+            return 1001  # Error code 1001: No comma found
+        except ValueError:
+            return 1002  # Error code 1002: Could not convert to integer
         except Exception as e:
-            print(f"Error reading moisture: {e}")
-            return 1000
+            return 1003  # Error code 1003: General error
 
     def close(self):
         if hasattr(self, 'ser') and self.ser is not None:

@@ -25,7 +25,7 @@ def get_soil_moisture():
         return plant.readMoisture()
     except Exception as e:
         print(f"Error reading moisture: {e}")
-        return 1000  # Return default value if error
+        return 2000  # Return default value if error
 
 def get_light_level():
     try:
