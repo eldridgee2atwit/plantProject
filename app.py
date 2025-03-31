@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
-import RPi.GPIO as GPIO
 import time
 from src.plantData import plantData
+from multiprocessing import Process
 
 app = Flask(__name__)
 
@@ -17,19 +17,17 @@ GPIO.setup(LIGHT_PIN, GPIO.OUT)
 # Initialize plant data reader
 plant = plantData()
 
-# Track light state
-light_state = False
 
 def get_soil_moisture():
     try:
-        return plant.readMoisture()
+        return int(plant.getData()[1])
     except Exception as e:
         print(f"Error reading moisture: {e}")
         return 2000  # Return default value if error
 
 def get_light_level():
     try:
-        return int(plant.readLight())
+        return int(plant.getData()[0])
     except Exception as e:
         print(f"Error reading light: {e}")
         return 0  # Return default value if error
@@ -59,13 +57,13 @@ def index():
 
 @app.route('/api/soil-moisture')
 def soil_moisture():
-    moisture = plant.readMoisture()
+    moisture = get_soil_moisture()
     return jsonify({"moisture": moisture})
 
 @app.route('/api/light-level')
 def light_level():
     try:
-        light = plant.readLight()
+        light = get_light_level()
         if light == 0:
             return jsonify({"light": "ON"})
         elif light == 1:

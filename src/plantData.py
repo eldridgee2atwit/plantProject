@@ -1,29 +1,33 @@
 import serial
-import time
+import threading
+import queue
 
 class plantData:
-    def __init__(self, port="/dev/ttyUSB1", baudrate=115200, timeout=1):
+    def __init__(self, port="/dev/ttyUSB0", baudrate=115200, timeout=1):
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
+        self.q = queue.Queue()
+        self.data = ("1","1")
+        self.running = True
         try:
             self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, timeout=self.timeout)
-            # Clear any stale data in the buffer
-            # self.ser.reset_input_buffer()
-            # time.sleep(0.1)  # Give the serial port time to stabilize
+            read_thread = threading.Thread(target=self._readData)
+            read_thread.daemon = True
+            read_thread.start()
         except Exception as e:
             self.ser = None
 
-    def _readData(self, index):
-            data = (self.ser.read_until(b'\n').decode('utf-8'))
-            parts = data.split(',')
-            return(parts[index])
+    def _readData(self):
+        while self.running:
+            if self.ser is None:
+                return
+            try:
+                raw_data = self.ser.read_until(b'\n').decode('utf-8').strip()
+                self.data = tuple(raw_data.split(','))
+            except Exception as e:
+                print(f"Error reading from serial: {e}")
     
-    def readLight(self):
-        try:
-            return(int(self._readData(0)))
-        except ValueError:
-           return 3000 # error in this part 
         # if self.ser is None:
         #     return "1"  # Default to OFF on error
         # try:
@@ -34,12 +38,8 @@ class plantData:
         #     print(f"Error reading light: {e}")
         #     return "1"  # Default to OFF on error
 
-    def readMoisture(self):
-        try:
-            return(int(self._readData(1)))
-        except ValueError:
-           return 3001 # error in this part 
-
+    def getData(self):
+        return self.data
         # if self.ser is None:
         #     return 1000  # Error code 1000: No serial connection
         # try:
