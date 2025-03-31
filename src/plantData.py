@@ -20,7 +20,6 @@ class plantData:
             return(parts[index])
     
     def readLight(self):
-
         try:
             return(int(self._readData(0)))
         except ValueError:

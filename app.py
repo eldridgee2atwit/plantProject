@@ -70,8 +70,6 @@ def light_level():
             return jsonify({"light": "ON"})
         elif light == 1:
             return jsonify({"light": "OFF"})
-        else:
-            return jsonify({"light": "ERROR", "raw_value": light})
     except Exception as e:
         print(f"Error in light_level endpoint: {e}")
         return jsonify({"light": "ERROR", "message": str(e)})
