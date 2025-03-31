@@ -39,6 +39,10 @@
     </div>
 
     <script>
+        // Store last valid values
+        let lastValidMoisture = null;
+        let lastValidLight = null;
+
         // Function to update moisture status
         function updateMoisture() {
             fetch('/api/soil-moisture')
@@ -47,20 +51,33 @@
                     const moistureValue = document.getElementById('moisture-value');
                     const moistureStatus = document.getElementById('moisture-status');
                     
-                    moistureValue.textContent = data.moisture;
-                    
-                    if (data.moisture >= 1000) {
+                    // Check if the value is valid (between 0 and 100)
+                    if (data.moisture >= 0 && data.moisture <= 100) {
+                        lastValidMoisture = data.moisture;
+                        moistureValue.textContent = `${data.moisture}%`;
+                        moistureStatus.textContent = 'Good';
+                        moistureStatus.className = 'status good';
+                    } else if (lastValidMoisture !== null) {
+                        // Use last valid value if current value is invalid
+                        moistureValue.textContent = `${lastValidMoisture}%`;
+                        moistureStatus.textContent = 'Good';
+                        moistureStatus.className = 'status good';
+                    } else {
+                        moistureValue.textContent = '--';
                         moistureStatus.textContent = 'Error';
                         moistureStatus.className = 'status error';
-                    } else if (data.moisture < 500) {
-                        moistureStatus.textContent = 'Too Dry';
-                        moistureStatus.className = 'status warning';
-                    } else {
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (lastValidMoisture !== null) {
+                        const moistureValue = document.getElementById('moisture-value');
+                        const moistureStatus = document.getElementById('moisture-status');
+                        moistureValue.textContent = `${lastValidMoisture}%`;
                         moistureStatus.textContent = 'Good';
                         moistureStatus.className = 'status good';
                     }
-                })
-                .catch(error => console.error('Error:', error));
+                });
         }
 
         // Function to update light status
@@ -71,17 +88,33 @@
                     const lightValue = document.getElementById('light-value');
                     const lightStatus = document.getElementById('light-status');
                     
-                    lightValue.textContent = data.light;
-                    
-                    if (data.light === 'ERROR') {
+                    // Check if the value is valid (0 or 1)
+                    if (data.light === 0 || data.light === 1) {
+                        lastValidLight = data.light;
+                        lightValue.textContent = data.light === 0 ? 'ON' : 'OFF';
+                        lightStatus.textContent = data.light === 0 ? 'ON' : 'OFF';
+                        lightStatus.className = `status ${data.light === 0 ? 'on' : 'off'}`;
+                    } else if (lastValidLight !== null) {
+                        // Use last valid value if current value is invalid
+                        lightValue.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
+                        lightStatus.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
+                        lightStatus.className = `status ${lastValidLight === 0 ? 'on' : 'off'}`;
+                    } else {
+                        lightValue.textContent = '--';
                         lightStatus.textContent = 'Error';
                         lightStatus.className = 'status error';
-                    } else {
-                        lightStatus.textContent = data.light;
-                        lightStatus.className = `status ${data.light.toLowerCase()}`;
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (lastValidLight !== null) {
+                        const lightValue = document.getElementById('light-value');
+                        const lightStatus = document.getElementById('light-status');
+                        lightValue.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
+                        lightStatus.textContent = lastValidLight === 0 ? 'ON' : 'OFF';
+                        lightStatus.className = `status ${lastValidLight === 0 ? 'on' : 'off'}`;
+                    }
+                });
         }
 
         // Water plant function
