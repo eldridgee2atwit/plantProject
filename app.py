@@ -59,13 +59,13 @@ def index():
 
 @app.route('/api/soil-moisture')
 def soil_moisture():
-    moisture = get_soil_moisture()
+    moisture = plant.readMoisture()
     return jsonify({"moisture": moisture})
 
 @app.route('/api/light-level')
 def light_level():
     try:
-        light = get_light_level()
+        light = plant.readLight()
         if light == 0:
             return jsonify({"light": "ON"})
         elif light == 1:
